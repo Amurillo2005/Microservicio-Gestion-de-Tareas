@@ -1,8 +1,6 @@
-import { prisma } from "../Cliente/cliente";
 import { Request, Response } from "express";
 import { TareaService } from "../Services/tarea.service";
 import { Status } from "../generated/prisma/enums";
-import { tryCatch } from "bullmq";
 
 export const crearTarea = async (req: Request, res: Response): Promise<void> => {
     try {
