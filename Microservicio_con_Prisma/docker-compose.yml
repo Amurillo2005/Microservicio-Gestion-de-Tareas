@@ -1,5 +1,4 @@
 services:
-
   mysql:
     image: mysql:8
     container_name: mysql_db
@@ -11,12 +10,23 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7
     container_name: redis_server
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   app:
     build: .
@@ -24,26 +34,26 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy   # ← espera a que MySQL esté listo de verdad
+      redis:
+        condition: service_healthy
     env_file:
       - .env
-    volumes:
-      - .:/app
-      - /app/node_modules
+    # ← Sin volúmenes: usa lo que está dentro del contenedor
 
   worker:
     build: .
     container_name: worker_tareas
     command: ["npm", "run", "worker"]
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     env_file:
       - .env
-    volumes:
-      - .:/app
-      - /app/node_modules
+    # ← Sin volúmenes
 
 volumes:
   mysql_data:
