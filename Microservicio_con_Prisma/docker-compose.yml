@@ -28,6 +28,9 @@ services:
       - redis
     env_file:
       - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
 
   worker:
     build: .
@@ -38,6 +41,9 @@ services:
       - redis
     env_file:
       - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
 
 volumes:
   mysql_data:
