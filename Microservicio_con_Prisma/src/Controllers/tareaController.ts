@@ -8,11 +8,13 @@ export const crearTarea = async (req: Request, res: Response): Promise<void> => 
         const tareaService = new TareaService();
         const tarea = await tareaService.crearTarea({ title, description, status, assignedTo, dueDate });
         res.status(201).json(tarea);
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
         res.status(500).json({
             error: "Error al crear la tarea",
-            detalle: error
+            detalle: {
+                error
+            }
         });
     }
 }

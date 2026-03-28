@@ -24,7 +24,7 @@ export class TareaService {
 
     async obtenerTodasLasTareas() {
         const tarea = await prisma.tarea.findMany();
-        if (!tarea) {
+        if (tarea.length === 0) {
             throw new Error("No se encontraron tareas");
         }
         return tarea;

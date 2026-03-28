@@ -1,6 +1,7 @@
 import dotenv from "dotenv"
 import express from "express";
 import tareaRoutes from "./Routes/tareaRoutes"
+import "dotenv/config";
 dotenv.config();
 
 const app = express();

@@ -1,0 +1,43 @@
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tareas
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    container_name: redis_server
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: api_tareas
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+      - redis
+    env_file:
+      - .env
+
+  worker:
+    build: .
+    container_name: worker_tareas
+    command: ["npm", "run", "worker"]
+    depends_on:
+      - mysql
+      - redis
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:
