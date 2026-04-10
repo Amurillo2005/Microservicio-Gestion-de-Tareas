@@ -1,7 +1,7 @@
-import { prisma } from "../Cliente/cliente";
-import { CrearTarea } from "../tarea_interface.ts/crear_tarea";
-import { Status } from "../generated/prisma/enums";
-import { tareaQueue } from "../queue/tarea.queue";
+import { prisma } from "../Cliente/cliente.js";
+import type { CrearTarea } from "../tarea_interface.ts/crear_tarea.js";
+import { Status } from "../generated/prisma/enums.js";
+import { tareaQueue } from "../queue/tarea.queue.js";
 
 export class TareaService {
     async crearTarea(data: CrearTarea) {
@@ -60,7 +60,7 @@ export class TareaService {
                 description: data.description,
                 status: data.status,
                 assignedTo: data.assignedTo,
-                dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+                ...(data.dueDate && { dueDate: new Date(data.dueDate) }),
             }
         })
 
@@ -79,7 +79,7 @@ export class TareaService {
                 description: data.description,
                 status: data.status,
                 assignedTo: data.assignedTo,
-                dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+                ...(data.dueDate && { dueDate: new Date(data.dueDate) }),
             }
         })
         return tarea;

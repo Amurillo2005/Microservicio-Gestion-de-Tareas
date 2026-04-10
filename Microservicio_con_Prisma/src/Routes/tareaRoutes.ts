@@ -1,5 +1,5 @@
 import express from "express";
-import { crearTarea, obtenerTareas, obtenerTareaPorId, actualizarTareaCompleta, actualizarTareaParcial, eliminarTarea, obtenerTareaPorEstado, generarReporteTarea, notificarTareasAVencer } from "../Controllers/tareaController";;
+import { crearTarea, obtenerTareas, obtenerTareaPorId, actualizarTareaCompleta, actualizarTareaParcial, eliminarTarea, obtenerTareaPorEstado, generarReporteTarea, notificarTareasAVencer } from "../Controllers/tareaController.js";
 
 const router = express.Router();
 

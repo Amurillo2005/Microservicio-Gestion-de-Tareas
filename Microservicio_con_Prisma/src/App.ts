@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
 import express from "express";
-import tareaRoutes from "./Routes/tareaRoutes"
+import tareaRoutes from "./Routes/tareaRoutes.js"
 import "dotenv/config";
 dotenv.config();
 

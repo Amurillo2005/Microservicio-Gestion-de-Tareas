@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { TareaService } from "../Services/tarea.service";
-import { Status } from "../generated/prisma/enums";
+import type { Request, Response } from "express";
+import { TareaService } from "../Services/tarea.service.js";
+import { Status } from "../generated/prisma/enums.js";
 
 export const crearTarea = async (req: Request, res: Response): Promise<void> => {
     try {
