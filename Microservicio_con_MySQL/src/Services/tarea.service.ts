@@ -1,5 +1,6 @@
 import type { tarea } from "../tarea_interface/tarea.interface.js";
 import { pool } from "../db/db.js";
+import type { RowDataPacket } from "mysql2";
 
 export class TareaService {
     async crearTarea(tarea: tarea){
@@ -12,6 +13,14 @@ export class TareaService {
             [tarea.title, tarea.description, tarea.status, tarea.assignedTo, tarea.dueDate]
         )
 
+        return tareas;
+    }
+
+    async obtenerTodasLasTareas() {
+        const [tareas] = await pool.query<RowDataPacket[]>("SELECT * FROM Tarea");
+        if (tareas.length === 0) {
+            throw new Error("No se encontraron tareas");
+        }
         return tareas;
     }
 }
