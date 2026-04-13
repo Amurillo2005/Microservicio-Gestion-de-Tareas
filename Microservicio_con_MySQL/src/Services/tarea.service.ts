@@ -86,5 +86,12 @@ export class TareaService {
         return tareas;
 
     }
+
+    async obtenerTareaPorEstado(status: string){
+        const [tareas] = await pool.query<RowDataPacket[]>(
+            "SELECT * FROM Tarea WHERE status = ?", [status]
+        )
+        return tareas;
+    }
  
 }
