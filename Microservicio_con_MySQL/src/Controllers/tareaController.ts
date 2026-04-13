@@ -71,3 +71,21 @@ export const actualizarTareaCompleta = async (req: Request, res: Response): Prom
         res.status(500).json({ error: "Error al actualizar la tarea" });
     }
 }
+
+export const actualizarTareaParcial = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { title, description, status, assignedTo, dueDate } = req.body;
+        const tareaService = new TareaService();
+        const tarea = await tareaService.actualizarTareaParcial(id as string, { title, description, status, assignedTo, dueDate });
+        res.status(200).json(tarea);
+    } catch (error: any) {
+        if (error.message === "No se encontró el id de esta tarea"){
+            res.status(404).json({
+                message: "Tarea no encontrada"
+            })
+        }
+
+        res.status(500).json({ error: "Error al actualizar la tarea" });
+    }
+}
