@@ -95,7 +95,8 @@ export const eliminarTarea = async (req: Request, res: Response): Promise<void> 
         const { id } = req.params;
         const tareaService = new TareaService();
         const tarea = await tareaService.eliminarTarea(Number(id));
-        res.status(200).json(tarea)
+        res.status(200).json(tarea);
+
     } catch (error: any) {
         if (error.message === "No se encontró el id de esta tarea") {
             res.status(404).json({

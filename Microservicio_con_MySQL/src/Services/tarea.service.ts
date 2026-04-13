@@ -49,7 +49,10 @@ export class TareaService {
             [tarea.title, tarea.description, tarea.status, tarea.assignedTo, tarea.dueDate, id]
         );
 
-        return tareas;
+        return {
+            ...(tareas.insertId ? { id: tareas.insertId } : {}),
+            ...tarea
+        };
     }
 
     async actualizarTareaParcial(id: number, tarea: Partial<tarea>){
@@ -62,20 +65,23 @@ export class TareaService {
             [tarea.title ?? null, tarea.description ?? null, tarea.status ?? null, tarea.assignedTo ?? null, tarea.dueDate ?? null, id]
         );
 
-        return tareas;
+        return {
+            ...(tareas.insertId ? { id: tareas.insertId } : {}),
+            ...tarea
+        };
     }
 
     async eliminarTarea(id: number){
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea")
-        }
 
         const [tareas] = await pool.query<ResultSetHeader>(
             "DELETE FROM Tarea WHERE id = ?", [id]
         );
 
-        return tareas;
+        if (tareas.affectedRows === 0) {
+            throw new Error("No se encontró el id de esta tarea");
+        }
 
+        return { message: "Tarea eliminada exitosamente" };
     }
 
     async obtenerTareaPorEstado(status: string){
