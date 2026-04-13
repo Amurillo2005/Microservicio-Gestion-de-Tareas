@@ -70,6 +70,21 @@ export class TareaService {
         return tareas;
     }
 
-    
+    async eliminarTarea(id: string){
+        if (!id) {
+            throw new Error("No se encontró el id de esta tarea")
+        }
+
+        const [tareas] = await pool.query<ResultSetHeader>(
+            "DELETE FROM Tarea WHERE id = ?", [id]
+        );
+
+        if (tareas.affectedRows === 0) {
+            throw new Error("No se encontró la tarea con el id especificado");
+        }
+
+        return tareas;
+
+    }
  
 }
