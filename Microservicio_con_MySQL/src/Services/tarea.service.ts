@@ -23,4 +23,14 @@ export class TareaService {
         }
         return tareas;
     }
+
+    async obtenerTareasPorId(id: string){
+        const [tareas] = await pool.query<RowDataPacket[]>("SELECT * FROM Tarea WHERE id = ?", [id]);
+        if (tareas.length === 0) {
+            throw new Error("No se encontraron tareas");
+        }
+        return tareas;
+    }
+
+    
 }
