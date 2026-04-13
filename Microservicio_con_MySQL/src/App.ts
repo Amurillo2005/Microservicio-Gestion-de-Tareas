@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { pool } from "./db/db.js";
+import tareaRoutes from "./Routes/tareaRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -22,3 +23,7 @@ async function conectarDB() {
 }
 
 conectarDB()
+
+app.use("/tareas", tareaRoutes);
+
+export default app;

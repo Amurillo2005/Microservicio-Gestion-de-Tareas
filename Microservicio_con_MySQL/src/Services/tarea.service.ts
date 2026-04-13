@@ -8,12 +8,15 @@ export class TareaService {
             throw new Error("Todos los campos son obligatorios");
         }
 
-        const tareas = await pool.query<ResultSetHeader>(
+        const [tareas] = await pool.query<ResultSetHeader>(
             "INSERT INTO Tarea (title, description, status, assignedTo, dueDate) VALUES (?, ?, ?, ?, ?)",
             [tarea.title, tarea.description, tarea.status, tarea.assignedTo, tarea.dueDate]
         );
 
-        return tareas;
+        return {
+            ...(tareas.insertId ? { id: tareas.insertId } : {}),
+            ...tarea
+        };
     }
 
     async obtenerTodasLasTareas() {
@@ -24,7 +27,7 @@ export class TareaService {
         return tareas;
     }
 
-    async obtenerTareasPorId(id: string){
+    async obtenerTareasPorId(id: number){
         const [tareas] = await pool.query<RowDataPacket[]>("SELECT * FROM Tarea WHERE id = ?", [id]);
         if (tareas.length === 0) {
             throw new Error("Tarea no encontrada");
@@ -32,7 +35,7 @@ export class TareaService {
         return tareas;
     }
 
-    async actualizarTareaCompleta(id: string, tarea: tarea){
+    async actualizarTareaCompleta(id: number, tarea: tarea){
         if (!id) {
             throw new Error("No se encontró el id de esta tarea")
         }
@@ -46,14 +49,10 @@ export class TareaService {
             [tarea.title, tarea.description, tarea.status, tarea.assignedTo, tarea.dueDate, id]
         );
 
-        if (tareas.affectedRows === 0) {
-            throw new Error("No se encontró la tarea con el id especificado");
-        }
-
         return tareas;
     }
 
-    async actualizarTareaParcial(id: string, tarea: Partial<tarea>){
+    async actualizarTareaParcial(id: number, tarea: Partial<tarea>){
         if (!id) {
             throw new Error("No se encontró el id de esta tarea")
         }
@@ -63,14 +62,10 @@ export class TareaService {
             [tarea.title ?? null, tarea.description ?? null, tarea.status ?? null, tarea.assignedTo ?? null, tarea.dueDate ?? null, id]
         );
 
-        if (tareas.affectedRows === 0) {
-            throw new Error("No se encontró la tarea con el id especificado");
-        }
-
         return tareas;
     }
 
-    async eliminarTarea(id: string){
+    async eliminarTarea(id: number){
         if (!id) {
             throw new Error("No se encontró el id de esta tarea")
         }
@@ -78,10 +73,6 @@ export class TareaService {
         const [tareas] = await pool.query<ResultSetHeader>(
             "DELETE FROM Tarea WHERE id = ?", [id]
         );
-
-        if (tareas.affectedRows === 0) {
-            throw new Error("No se encontró la tarea con el id especificado");
-        }
 
         return tareas;
 

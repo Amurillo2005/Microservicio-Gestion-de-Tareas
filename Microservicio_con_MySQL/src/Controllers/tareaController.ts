@@ -34,7 +34,7 @@ export const obtenerTareaPorId = async (req: Request, res: Response): Promise<vo
     try {
         const { id } = req.params;
         const tareaService = new TareaService();
-        const tareas = await tareaService.obtenerTareasPorId(id as string);
+        const tareas = await tareaService.obtenerTareasPorId(Number(id));
         res.status(200).json(tareas);
     } catch (error: any) {
         if (error.message === "Tarea no encontrada") {
@@ -52,7 +52,7 @@ export const actualizarTareaCompleta = async (req: Request, res: Response): Prom
         const { id } = req.params;
         const { title, description, status, assignedTo, dueDate } = req.body;
         const tareaService = new TareaService();
-        const tarea = await tareaService.actualizarTareaCompleta(id as string, { title, description, status, assignedTo, dueDate });
+        const tarea = await tareaService.actualizarTareaCompleta(Number(id), { title, description, status, assignedTo, dueDate });
         res.status(200).json(tarea);
     } catch (error: any) {
         if (error.message === "No se encontró el id de esta tarea") {
@@ -77,7 +77,7 @@ export const actualizarTareaParcial = async (req: Request, res: Response): Promi
         const { id } = req.params;
         const { title, description, status, assignedTo, dueDate } = req.body;
         const tareaService = new TareaService();
-        const tarea = await tareaService.actualizarTareaParcial(id as string, { title, description, status, assignedTo, dueDate });
+        const tarea = await tareaService.actualizarTareaParcial(Number(id), { title, description, status, assignedTo, dueDate });
         res.status(200).json(tarea);
     } catch (error: any) {
         if (error.message === "No se encontró el id de esta tarea"){
@@ -87,5 +87,33 @@ export const actualizarTareaParcial = async (req: Request, res: Response): Promi
         }
 
         res.status(500).json({ error: "Error al actualizar la tarea" });
+    }
+}
+
+export const eliminarTarea = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const tareaService = new TareaService();
+        const tarea = await tareaService.eliminarTarea(Number(id));
+        res.status(200).json(tarea)
+    } catch (error: any) {
+        if (error.message === "No se encontró el id de esta tarea") {
+            res.status(404).json({
+                message: "Tarea no encontrada"
+            });
+            return;
+        }
+        res.status(500).json({ error: "Error al eliminar la tarea" });
+    }
+}
+
+export const obtenerTareaPorEstado = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { status } = req.params;
+        const tareaService = new TareaService();
+        const tareas = await tareaService.obtenerTareaPorEstado(status as string);
+        res.status(200).json(tareas);
+    } catch (error: any) {
+        res.status(500).json({ error: "Error al obtener las tareas por estado" });
     }
 }
