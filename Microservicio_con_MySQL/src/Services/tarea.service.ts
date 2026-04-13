@@ -32,5 +32,21 @@ export class TareaService {
         return tareas;
     }
 
-    
+    async actualizarTareaCompleta(id: string, tarea: tarea){
+        if (!id) {
+            throw new Error("No se encontró el id de esta tarea")
+        }
+
+        if (!tarea.title || !tarea.description || !tarea.status || !tarea.assignedTo || !tarea.dueDate) {
+            throw new Error("Todos los campos son obligatorios");
+        }
+
+        const [tareas] = await pool.query(
+            "UPDATE Tarea SET title = ?, description = ?, status = ?, assignedTo = ?, dueDate = ? WHERE id = ?",
+            [tarea.title, tarea.description, tarea.status, tarea.assignedTo, tarea.dueDate, id]
+        );
+
+        return tareas;
+    }
+ 
 }
