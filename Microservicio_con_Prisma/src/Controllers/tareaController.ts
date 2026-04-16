@@ -160,12 +160,17 @@ export const obtenerTareaPorEstado = async (req: Request, res: Response): Promis
     }
 }
 
-export const notificarTareasAVencer = async (req: Request, res: Response): Promise<void> => {
+export const programarTrabajoAsincrono = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const tareaService = new TareaService();
-        const result = await tareaService.notificarTareasAVencer(id as string);
-        res.status(200).json(result);
+        await tareaService.programarTrabajoAsincrono(id as string);
+        
+        console.log("Antes del response")
+        res.status(200).json({
+            message: "Trabajo programado correctamente"
+        })
+        console.log("Después del response")
     } catch (error: any) {
         if (error.message === "No se encontró el id de esta tarea") {
             res.status(404).json({
@@ -174,7 +179,14 @@ export const notificarTareasAVencer = async (req: Request, res: Response): Promi
             return;
         }
 
-        if (error.message === "La tarea no tiene una fecha de vencimiento") {
+        if (error.message === "La tarea ya ha vencido") {
+            res.status(409).json({
+                message: "La tarea ya ha vencido"
+            });
+            return;
+        }
+
+        else if (error.message === "La tarea no tiene una fecha de vencimiento") {
             res.status(400).json({
                 message: "La tarea no tiene una fecha de vencimiento"
             });
@@ -182,20 +194,7 @@ export const notificarTareasAVencer = async (req: Request, res: Response): Promi
         }
 
         res.status(500).json({
-            message: "Error al notificar las tareas a vencer"
-        })
-    }
-}
-
-export const generarReporteTarea = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { id } = req.params;
-        const tareaService = new TareaService();
-        const result = await tareaService.generarReporteTarea(id as string);
-        res.status(200).json(result);
-    } catch (error) {
-        res.status(500).json({
-            message: "Hubo un error al generar el reporte de la tarea"
+            message: "Error al programar el trabajo asincrono"
         })
     }
 }

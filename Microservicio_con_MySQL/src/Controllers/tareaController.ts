@@ -118,3 +118,22 @@ export const obtenerTareaPorEstado = async (req: Request, res: Response): Promis
         res.status(500).json({ error: "Error al obtener las tareas por estado" });
     }
 }
+
+export const programarTrabajoAsincrono = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const tareaService = new TareaService();
+        await tareaService.programarTrabajoAsincrono(Number(id));
+        res.status(200).json({
+            message: "Trabajo programado correctamente"
+        })
+    } catch (error: any) {
+        if (error.message === "La tarea ya ha vencido") {
+            res.status(409).json({
+                message: "La tarea ya ha vencido"
+            });
+            return;
+        }
+        res.status(500).json({ error: error.message });
+    }
+}

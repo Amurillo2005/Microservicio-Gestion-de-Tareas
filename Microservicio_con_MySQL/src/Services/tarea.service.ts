@@ -1,9 +1,11 @@
 import type { tarea } from "../tarea_interface/tarea.interface.js";
 import { pool } from "../db/db.js";
 import type { RowDataPacket, ResultSetHeader } from "mysql2";
+import { tareaQueue } from "../queue/tarea.queue.js";
+import { Temporal } from "@js-temporal/polyfill";
 
 export class TareaService {
-    async crearTarea(tarea: tarea){
+    async crearTarea(tarea: tarea) {
         if (!tarea.title || !tarea.description || !tarea.status || !tarea.assignedTo || !tarea.dueDate) {
             throw new Error("Todos los campos son obligatorios");
         }
@@ -27,7 +29,7 @@ export class TareaService {
         return tareas;
     }
 
-    async obtenerTareasPorId(id: number){
+    async obtenerTareasPorId(id: number) {
         const [tareas] = await pool.query<RowDataPacket[]>("SELECT * FROM Tarea WHERE id = ?", [id]);
         if (tareas.length === 0) {
             throw new Error("Tarea no encontrada");
@@ -35,7 +37,7 @@ export class TareaService {
         return tareas;
     }
 
-    async actualizarTareaCompleta(id: number, tarea: tarea){
+    async actualizarTareaCompleta(id: number, tarea: tarea) {
         if (!id) {
             throw new Error("No se encontró el id de esta tarea")
         }
@@ -55,7 +57,7 @@ export class TareaService {
         };
     }
 
-    async actualizarTareaParcial(id: number, tarea: Partial<tarea>){
+    async actualizarTareaParcial(id: number, tarea: Partial<tarea>) {
         if (!id) {
             throw new Error("No se encontró el id de esta tarea")
         }
@@ -71,7 +73,7 @@ export class TareaService {
         };
     }
 
-    async eliminarTarea(id: number){
+    async eliminarTarea(id: number) {
 
         const [tareas] = await pool.query<ResultSetHeader>(
             "DELETE FROM Tarea WHERE id = ?", [id]
@@ -84,11 +86,35 @@ export class TareaService {
         return { message: "Tarea eliminada exitosamente" };
     }
 
-    async obtenerTareaPorEstado(status: string){
+    async obtenerTareaPorEstado(status: string) {
         const [tareas] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM Tarea WHERE status = ?", [status]
         )
         return tareas;
     }
- 
+
+    async programarTrabajoAsincrono(id: number) {
+        const [tareas] = await pool.query<RowDataPacket[]>(
+            "SELECT * FROM Tarea WHERE id = ?", [id]
+        )
+
+        const tarea = tareas[0]!;
+
+        if (tareas.length === 0) {
+            throw new Error("Tarea no encontrada");
+        }
+
+        const fechaActual = Temporal.Now.instant();
+        const fechaVencimiento = Temporal.Instant.fromEpochMilliseconds(tarea.dueDate.getTime());
+
+        if (Temporal.Instant.compare(fechaActual, fechaVencimiento) === -1) {
+            await tareaQueue.add("Notificar fecha de vencimiento", {
+                title: tarea.title
+            })
+        }else {
+            throw new Error("La tarea ya ha vencido");
+        }
+
+    }
+
 }

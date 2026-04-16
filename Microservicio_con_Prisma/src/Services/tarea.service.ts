@@ -2,6 +2,7 @@ import { prisma } from "../Cliente/cliente.js";
 import type { CrearTarea } from "../tarea_interface.ts/crear_tarea.js";
 import { Status } from "../generated/prisma/enums.js";
 import { tareaQueue } from "../queue/tarea.queue.js";
+import { Temporal } from "@js-temporal/polyfill";
 
 export class TareaService {
     async crearTarea(data: CrearTarea) {
@@ -112,7 +113,7 @@ export class TareaService {
         return tarea
     }
 
-    async notificarTareasAVencer(id: string) {
+    async programarTrabajoAsincrono(id: string) {
         if (!id) {
             throw new Error("No se encontró el id de esta tarea")
         }
@@ -125,31 +126,17 @@ export class TareaService {
             throw new Error("Tarea no encontrada");
         }
 
-        if (!tarea.dueDate) {
-            throw new Error("La tarea no tiene una fecha de vencimiento");
+        const fechaActual = Temporal.Now.instant();
+        const fechaVencimiento = Temporal.Instant.fromEpochMilliseconds(tarea.dueDate!.getTime());
+
+        if (Temporal.Instant.compare(fechaActual, fechaVencimiento) === -1) {
+            await tareaQueue.add("Notificar fecha de vencimiento", {
+                title: tarea.title
+            })
+        }else {
+            throw new Error("La tarea ya ha vencido");
         }
 
-        await tareaQueue.add("Notificar due_date",
-            { tareaID: id },
-            { delay: 5000 }
-
-        )
-
-        return {
-            message: "Notificación programada correctamente"
-        };
     }
 
-    async generarReporteTarea(id: string) {
-
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea")
-        }
-        await tareaQueue.add("Generar reporte", {
-            tareaId: id
-        })
-
-        return { message: "Reporte en proceso" }
-
-    }
 }
