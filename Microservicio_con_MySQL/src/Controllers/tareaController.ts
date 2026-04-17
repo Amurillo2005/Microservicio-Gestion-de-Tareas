@@ -134,6 +134,13 @@ export const programarTrabajoAsincrono = async (req: Request, res: Response): Pr
             });
             return;
         }
+
+        if (error.message === "Este trabajo ya sido programado") {
+            res.status(409).json({
+                message: "El trabajo ya está programado"
+            });
+            return;
+        }
         res.status(500).json({ error: error.message });
     }
 }

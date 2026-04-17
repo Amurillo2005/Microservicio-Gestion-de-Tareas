@@ -107,9 +107,21 @@ export class TareaService {
         const fechaActual = Temporal.Now.instant();
         const fechaVencimiento = Temporal.Instant.fromEpochMilliseconds(tarea.dueDate.getTime());
 
+        const JobId = `notificacion-${tarea.id}`;
+
+        const trabajoExistente = await tareaQueue.getJob(JobId);
+
+        if (trabajoExistente) {
+            throw new Error("Este trabajo ya sido programado")
+        }
+
         if (Temporal.Instant.compare(fechaActual, fechaVencimiento) === -1) {
             await tareaQueue.add("Notificar fecha de vencimiento", {
+                tareaId: tarea.id,
                 title: tarea.title
+            },{
+                jobId: JobId,
+                removeOnComplete: false
             })
         }else {
             throw new Error("La tarea ya ha vencido");
