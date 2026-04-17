@@ -134,7 +134,7 @@ export class TareaService {
         const trabajoExistente = await tareaQueue.getJob(JobId);
 
         if (trabajoExistente) {
-            throw new Error("Este trabajo ya sido programado")
+            throw new Error("Este trabajo ya ha sido programado")
         }
 
         if (Temporal.Instant.compare(fechaActual, fechaVencimiento) === -1) {

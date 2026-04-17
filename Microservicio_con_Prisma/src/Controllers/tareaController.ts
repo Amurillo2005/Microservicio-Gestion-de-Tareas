@@ -165,12 +165,11 @@ export const programarTrabajoAsincrono = async (req: Request, res: Response): Pr
         const { id } = req.params;
         const tareaService = new TareaService();
         await tareaService.programarTrabajoAsincrono(id as string);
-        
-        console.log("Antes del response")
+
         res.status(200).json({
             message: "Trabajo programado correctamente"
         })
-        console.log("Después del response")
+
     } catch (error: any) {
         if (error.message === "No se encontró el id de esta tarea") {
             res.status(404).json({
@@ -186,9 +185,16 @@ export const programarTrabajoAsincrono = async (req: Request, res: Response): Pr
             return;
         }
 
-        else if (error.message === "La tarea no tiene una fecha de vencimiento") {
+        if (error.message === "La tarea no tiene una fecha de vencimiento") {
             res.status(400).json({
                 message: "La tarea no tiene una fecha de vencimiento"
+            });
+            return;
+        }
+
+        if (error.message === "Este trabajo ya ha sido programado") {
+            res.status(409).json({
+                message: "El trabajo ya está programado"
             });
             return;
         }
