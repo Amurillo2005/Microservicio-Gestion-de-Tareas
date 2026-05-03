@@ -6,16 +6,16 @@ import { Temporal } from "@js-temporal/polyfill";
 
 export class TareaService {
     async crearTarea(data: CrearTarea) {
-        if (!data.title || !data.description || !data.status || !data.assignedTo || !data.dueDate) {
-            throw new Error("Todos los campos son obligatorios");
+        if (!data.title || !data.status ) {
+            throw new Error("Estos campos son obligatorios");
         }
 
         const tarea = await prisma.tarea.create({
             data: {
                 title: data.title,
-                description: data.description,
+                description: data.description ?? null,
                 status: data.status,
-                assignedTo: data.assignedTo,
+                assignedTo: data.assignedTo ?? null,
                 dueDate: data.dueDate ? new Date(data.dueDate) : new Date(),
             }
         })
@@ -77,9 +77,9 @@ export class TareaService {
             where: { id },
             data: {
                 title: data.title,
-                description: data.description,
+                description: data.description ?? null,
                 status: data.status,
-                assignedTo: data.assignedTo,
+                assignedTo: data.assignedTo ?? null,
                 ...(data.dueDate && { dueDate: new Date(data.dueDate) }),
             }
         })

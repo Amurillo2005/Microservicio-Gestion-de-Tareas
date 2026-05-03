@@ -6,8 +6,8 @@ import { Temporal } from "@js-temporal/polyfill";
 
 export class TareaService {
     async crearTarea(tarea: tarea) {
-        if (!tarea.title || !tarea.description || !tarea.status || !tarea.assignedTo || !tarea.dueDate) {
-            throw new Error("Todos los campos son obligatorios");
+        if (!tarea.title || !tarea.status ) {
+            throw new Error("Estos campos son obligatorios");
         }
 
         const [tareas] = await pool.query<ResultSetHeader>(

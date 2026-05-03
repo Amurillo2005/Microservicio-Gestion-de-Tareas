@@ -1,7 +1,7 @@
 export interface tarea {
     title: string;
-    description: string;
+    description?: string;
     status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
-    assignedTo: string;
-    dueDate: Date;
+    assignedTo?: string;
+    dueDate?: Date;
 }

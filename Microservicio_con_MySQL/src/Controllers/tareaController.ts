@@ -9,7 +9,12 @@ export const crearTarea = async (req: Request, res: Response): Promise<void> => 
         const tarea = await tareaService.crearTarea({ title, description, status, assignedTo, dueDate });
         res.status(201).json(tarea)
     } catch (error: any) {
-        console.error("Error al crear la tarea: ", error);
+        if (error.message === "Estos campos son obligatorios") {
+            res.status(400).json({
+                message: "Estos campos son obligatorios"
+            });
+            return;
+        }
         res.status(500).json({ message: "Error al crear la tarea" });
     }
 }

@@ -1,7 +1,7 @@
 export interface CrearTarea {
     title: string;
-    description: string;
+    description?: string;
     status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
-    assignedTo: string;
-    dueDate: string;
+    assignedTo?: string;
+    dueDate?: string;
 }
