@@ -10,4 +10,12 @@ export class TareaService {
         const tareaCreada = await Tarea.create(tarea);
         return tareaCreada;
     }
+
+    async obtenerTareas() {
+        const tareas = await Tarea.find();
+        if (!tareas) {
+            throw new Error("No se encontraron tareas");
+        }
+        return tareas;
+    }
 }

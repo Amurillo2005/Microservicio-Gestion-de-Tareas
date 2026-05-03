@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import "dotenv/config";
-import type { tryCatch } from "bullmq";
 
 export const connectDB = async () => {
     try {
