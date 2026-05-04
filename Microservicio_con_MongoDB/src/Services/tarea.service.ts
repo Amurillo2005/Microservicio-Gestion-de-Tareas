@@ -34,4 +34,17 @@ export class TareaService {
         return tarea;
     }
 
+    async actualizarTareaCompleta(id: string, tarea: ITarea){
+        if (!mongoose.isValidObjectId(id)){
+            throw new Error("No se encontró el id de esta tarea");
+        }
+
+        if (!tarea.title || !tarea.description || !tarea.status || !tarea.assignedTo || !tarea.dueDate) {
+            throw new Error("Todos los campos son obligatorios");
+        }
+
+        const tareaActualizada = await Tarea.findOneAndReplace({ _id: id }, tarea, { returnDocument: "after" });
+        return tareaActualizada;
+    }
+
 }
