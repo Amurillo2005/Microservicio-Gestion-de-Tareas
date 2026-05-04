@@ -7,7 +7,7 @@ import { Temporal } from "@js-temporal/polyfill";
 export class TareaService {
     async crearTarea(tarea: tarea) {
         if (!tarea.title || !tarea.status ) {
-            throw new Error("Estos campos son obligatorios");
+            throw new Error("Campos incompletos");
         }
 
         const [tareas] = await pool.query<ResultSetHeader>(
@@ -43,7 +43,7 @@ export class TareaService {
         }
 
         if (!tarea.title || !tarea.description || !tarea.status || !tarea.assignedTo || !tarea.dueDate) {
-            throw new Error("Todos los campos son obligatorios");
+            throw new Error("Campos incompletos");
         }
 
         const [tareas] = await pool.query<ResultSetHeader>(

@@ -6,7 +6,7 @@ import type { tarea } from "../tarea_interface/tarea.interface.js";
 export class TareaService {
     async crearTarea (tarea: ITarea) {
         if (!tarea.title || !tarea.status ) {
-            throw new Error("Estos campos son obligatorios");
+            throw new Error("Campos incompletos");
         }
 
         const tareaCreada = await Tarea.create(tarea);
@@ -44,6 +44,15 @@ export class TareaService {
         }
 
         const tareaActualizada = await Tarea.findOneAndReplace({ _id: id }, tarea, { returnDocument: "after" });
+        return tareaActualizada;
+    }
+
+    async actualizarTareaParcial(id: string, tarea: Partial<ITarea>) {
+        if (!mongoose.isValidObjectId(id)){
+            throw new Error("No se encontró el id de esta tarea");
+        }
+
+        const tareaActualizada = await Tarea.findOneAndUpdate({ _id: id }, tarea, { returnDocument: "after" });
         return tareaActualizada;
     }
 

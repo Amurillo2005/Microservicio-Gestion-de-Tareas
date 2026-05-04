@@ -9,9 +9,9 @@ export const crearTarea = async (req: Request, res: Response): Promise<void> => 
         const tarea = await tareaService.crearTarea({ title, description, status, assignedTo, dueDate });
         res.status(201).json(tarea);
     } catch (error: any) {
-        if (error.message === "Estos campos son obligatorios") {
+        if (error.message === "Campos incompletos") {
             res.status(400).json({
-                message: "Estos campos son obligatorios"
+                message: "Campos incompletos"
             });
             return;
         }
@@ -82,9 +82,9 @@ export const actualizarTareaCompleta = async (req: Request, res: Response): Prom
             return;
         }
 
-        if (error.message === "Todos los campos son obligatorios") {
+        if (error.message === "Campos incompletos") {
             res.status(400).json({
-                message: "Todos los campos son obligatorios"
+                message: "Campos incompletos"
             });
             return;
         }

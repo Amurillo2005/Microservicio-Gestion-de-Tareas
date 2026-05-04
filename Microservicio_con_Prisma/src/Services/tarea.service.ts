@@ -7,7 +7,7 @@ import { Temporal } from "@js-temporal/polyfill";
 export class TareaService {
     async crearTarea(data: CrearTarea) {
         if (!data.title || !data.status ) {
-            throw new Error("Estos campos son obligatorios");
+            throw new Error("Campos incompletos");
         }
 
         const tarea = await prisma.tarea.create({
@@ -51,7 +51,7 @@ export class TareaService {
         }
 
         if (!data.title || !data.description || !data.status || !data.assignedTo || !data.dueDate) {
-            throw new Error("Todos los campos son obligatorios");
+            throw new Error("Campos incompletos");
         }
 
         const tarea = await prisma.tarea.update({
