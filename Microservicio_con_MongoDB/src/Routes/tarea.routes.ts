@@ -1,5 +1,5 @@
 import express from "express";
-import { crearTarea, obtenerTareas, obtenerTareaPorId, actualizarTareaCompleta, actualizarTareaParcial } from "../Controllers/tarea.controller.js";
+import { crearTarea, obtenerTareas, obtenerTareaPorId, actualizarTareaCompleta, actualizarTareaParcial, eliminarTarea, obtenerTareasPorStatus } from "../Controllers/tarea.controller.js";
 
 const router = express.Router();
 router.post("/tasks", crearTarea);
@@ -7,4 +7,6 @@ router.get("/tasks", obtenerTareas);
 router.get("/tasks/:id", obtenerTareaPorId);
 router.put("/tasks/:id", actualizarTareaCompleta);
 router.patch("/tasks/:id", actualizarTareaParcial);
+router.delete("/tasks/:id", eliminarTarea);
+router.get("/tasks/status/:status", obtenerTareasPorStatus);
 export default router;

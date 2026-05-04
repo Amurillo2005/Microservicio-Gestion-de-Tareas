@@ -15,7 +15,7 @@ export class TareaService {
 
     async obtenerTareas() {
         const tareas = await Tarea.find();
-        if (!tareas) {
+        if (tareas.length === 0) {
             throw new Error("No se encontraron tareas");
         }
         return tareas;
@@ -54,6 +54,23 @@ export class TareaService {
 
         const tareaActualizada = await Tarea.findOneAndUpdate({ _id: id }, tarea, { returnDocument: "after" });
         return tareaActualizada;
+    }
+
+    async eliminarTarea(id: string) {
+        if (!mongoose.isValidObjectId(id)){
+            throw new Error("No se encontró el id de esta tarea");
+        }
+
+        const tareaEliminada = await Tarea.findByIdAndDelete(id);
+        return tareaEliminada;
+    }
+
+    async obtenerTareasPorStatus(status: string) {
+        const tareas = await Tarea.find({ status });
+        if (tareas.length === 0){
+            throw new Error("No se encontraron tareas con este status");
+        }
+        return tareas;
     }
 
 }
