@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Worker } from "bullmq";;
+import { Worker } from "bullmq";
 export const tareaWorker = new Worker("tareaQueue", async (job) => {
     if (job.name === "Notificar fecha de vencimiento") {
         console.log(`Notificación: la tarea ${job.data.title} está a punto de vencer`)
