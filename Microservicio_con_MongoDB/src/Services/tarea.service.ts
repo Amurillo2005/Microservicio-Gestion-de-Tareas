@@ -1,7 +1,8 @@
 import type { ITarea } from "../models/tarea.model.js";
 import { Tarea } from "../models/tarea.model.js";
 import mongoose from "mongoose";
-import type { tarea } from "../tarea_interface/tarea.interface.js";
+import { Temporal } from "@js-temporal/polyfill";
+import { tareaQueue } from "../queue/tarea.queue.js";
 
 export class TareaService {
     async crearTarea (tarea: ITarea) {
@@ -71,6 +72,41 @@ export class TareaService {
             throw new Error("No se encontraron tareas con este status");
         }
         return tareas;
+    }
+
+    async programarTrabajoAsincrono(id: string) {
+
+        const tarea = await Tarea.findById(id as string);
+        if (!tarea){
+            throw new Error("No se encontró el id de esta tarea");
+        }
+
+        if (!tarea.dueDate) {
+            throw new Error("La tarea no tiene fecha de vencimiento");
+        }
+
+        const fechaActual = Temporal.Now.instant();
+        const fechaVencimiento = Temporal.Instant.fromEpochMilliseconds(tarea.dueDate.getTime());
+
+        const JobId = `notificacion-${tarea.id}`;
+
+        const trabajoExistente = await tareaQueue.getJob(JobId);
+
+        if (trabajoExistente) {
+            throw new Error("Este trabajo ya ha sido programado")
+        }
+
+        if (Temporal.Instant.compare(fechaActual, fechaVencimiento) === -1) {
+            await tareaQueue.add("Notificar fecha de vencimiento", {
+                tareaId: tarea.id,
+                title: tarea.title
+            },{
+                jobId: JobId,
+                removeOnComplete: false
+            })
+        }else {
+            throw new Error("La tarea ya ha vencido");
+        }
     }
 
 }

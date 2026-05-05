@@ -131,3 +131,38 @@ export const obtenerTareasPorStatus = async (req: Request, res: Response): Promi
         res.status(500).json({ message: "Error al obtener las tareas" });
     }
 }
+
+export const programarTrabajoAsincrono = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const tareaService = new TareaService();
+        await tareaService.programarTrabajoAsincrono(id as string);
+        res.status(200).json({ message: "Trabajo programado correctamente" });
+    } catch (error: any) {
+        if (error.message === "No se encontró el id de esta tarea") {
+            res.status(404).json({
+                message: "Tarea no encontrada"
+            });
+            return;
+        }
+        if (error.message === "La tarea no tiene fecha de vencimiento") {
+            res.status(400).json({
+                message: "La tarea no tiene fecha de vencimiento"
+            });
+            return;
+        }
+        if (error.message === "Este trabajo ya ha sido programado") {
+            res.status(400).json({
+                message: "Este trabajo ya ha sido programado"
+            });
+            return;
+        }
+        if (error.message === "La tarea ya ha vencido") {
+            res.status(400).json({
+                message: "La tarea ya ha vencido"
+            });
+            return;
+        }
+        res.status(500).json({ message: "Error al programar el trabajo" });
+    }
+}
