@@ -9,13 +9,14 @@ export const crearTarea = async (req: Request, res: Response): Promise<void> => 
         const tarea = await tareaService.crearTarea({ title, description, status, assignedTo, dueDate });
         res.status(201).json(tarea)
     } catch (error: any) {
-        if (error.message === "Campos incompletos") {
+        if (error.message === "El titulo es requerido") {
             res.status(400).json({
-                message: "Campos incompletos"
+                message: "El titulo es requerido"
             });
             return;
         }
-        res.status(500).json({ message: "Error al crear la tarea" });
+
+        res.status(500).json({ message: "Error al crear la tarea", error: error.message });
     }
 }
 

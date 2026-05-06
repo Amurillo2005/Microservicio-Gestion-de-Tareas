@@ -8,12 +8,13 @@ export const crearTarea = async (req: Request, res: Response): Promise<void> => 
         const tarea = await tareaService.crearTarea({ title, description, status, assignedTo, dueDate } as any);
         res.status(201).json(tarea);
     } catch (error: any) {
-        if (error.message === "Campos incompletos") {
+        if (error.message === "El titulo es requerido") {
             res.status(400).json({
-                message: "Campos incompletos"
+                message: "El titulo es requerido"
             });
             return;
         }
+
         res.status(500).json({ message: "Error al crear la tarea" });
     }
 }
@@ -91,7 +92,7 @@ export const actualizarTareaParcial = async (req: Request, res: Response): Promi
             });
             return;
         }
-        res.status(500).json({ message: "Error al actualizar la tarea" });
+        res.status(500).json({ message: "Error al actualizar la tarea parcialmente" });
     }
 }
 
@@ -101,8 +102,7 @@ export const eliminarTarea = async (req: Request, res: Response): Promise<void> 
         const tareaService = new TareaService();
         const tarea = await tareaService.eliminarTarea(id as string);
         res.status(200).json({
-            message: "Tarea eliminada correctamente",
-            tarea
+            message: "Tarea eliminada correctamente"
         })
     } catch (error: any) {
         if (error.message === "No se encontró el id de esta tarea") {

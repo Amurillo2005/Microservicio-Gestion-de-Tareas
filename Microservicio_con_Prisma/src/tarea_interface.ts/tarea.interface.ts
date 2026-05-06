@@ -1,4 +1,4 @@
-export interface CrearTarea {
+export interface tarea {
     title: string;
     description?: string;
     status: "PENDING" | "IN_PROGRESS" | "COMPLETED";

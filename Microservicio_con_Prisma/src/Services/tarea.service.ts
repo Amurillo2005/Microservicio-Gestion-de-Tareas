@@ -1,26 +1,26 @@
 import { prisma } from "../Cliente/cliente.js";
-import type { CrearTarea } from "../tarea_interface.ts/crear_tarea.js";
+import type { tarea } from "../tarea_interface.ts/tarea.interface.js";
 import { Status } from "../generated/prisma/enums.js";
 import { tareaQueue } from "../queue/tarea.queue.js";
 import { Temporal } from "@js-temporal/polyfill";
 
 export class TareaService {
-    async crearTarea(data: CrearTarea) {
-        if (!data.title || !data.status ) {
-            throw new Error("Campos incompletos");
+    async crearTarea(tarea: tarea) {
+        if (!tarea.title) {
+            throw new Error("El titulo es requerido");
         }
 
-        const tarea = await prisma.tarea.create({
+        const nuevaTarea = await prisma.tarea.create({
             data: {
-                title: data.title,
-                description: data.description ?? null,
-                status: data.status,
-                assignedTo: data.assignedTo ?? null,
-                dueDate: data.dueDate ? new Date(data.dueDate) : new Date(),
+                title: tarea.title,
+                description: tarea.description ?? null,
+                status: tarea.status ?? "PENDING",
+                assignedTo: tarea.assignedTo ?? null,
+                dueDate: tarea.dueDate ? new Date(Temporal.PlainDate.from(tarea.dueDate).toString()) : null
             }
         })
 
-        return tarea;
+        return nuevaTarea;
     }
 
     async obtenerTodasLasTareas() {
@@ -32,68 +32,72 @@ export class TareaService {
     }
 
     async obtenerTareasPorId(id: string) {
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea");
-        }
+
         const tarea = await prisma.tarea.findUnique({
             where: { id }
         })
 
-        if (!tarea) {
+        if (!tarea?.id) {
             throw new Error("Tarea no encontrada");
         }
+        
         return tarea;
     }
 
-    async actualizarTareaCompleta(id: string, data: CrearTarea) {
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea")
-        }
+    async actualizarTareaCompleta(id: string, tarea: tarea) {
 
-        if (!data.title || !data.description || !data.status || !data.assignedTo || !data.dueDate) {
+        if (!tarea.title || !tarea.description || !tarea.status || !tarea.assignedTo || !tarea.dueDate) {
             throw new Error("Campos incompletos");
         }
 
-        const tarea = await prisma.tarea.update({
+        const tareaActualizada = await prisma.tarea.update({
             where: { id },
             data: {
-                title: data.title,
-                description: data.description,
-                status: data.status,
-                assignedTo: data.assignedTo,
-                ...(data.dueDate && { dueDate: new Date(data.dueDate) }),
+                title: tarea.title,
+                description: tarea.description,
+                status: tarea.status,
+                assignedTo: tarea.assignedTo,
+                ...(tarea.dueDate && { dueDate: new Date(Temporal.PlainDate.from(tarea.dueDate).toString()) }),
             }
         })
 
-        return tarea;
-    }
-
-    async actualizarTareaParcial(id: string, data: CrearTarea) {
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea")
+        if (!tareaActualizada.id) {
+            throw new Error("Tarea no encontrada");
         }
 
-        const tarea = await prisma.tarea.update({
+        return tareaActualizada;
+    }
+
+    async actualizarTareaParcial(id: string, tarea: tarea) {
+        
+        const tareaActualizada = await prisma.tarea.update({
             where: { id },
             data: {
-                title: data.title,
-                description: data.description ?? null,
-                status: data.status,
-                assignedTo: data.assignedTo ?? null,
-                ...(data.dueDate && { dueDate: new Date(data.dueDate) }),
+                title: tarea.title,
+                description: tarea.description ?? null,
+                status: tarea.status,
+                assignedTo: tarea.assignedTo ?? null,
+                ...(tarea.dueDate && { dueDate: new Date(Temporal.PlainDate.from(tarea.dueDate).toString()) }),
             }
         })
-        return tarea;
+
+        if (!tareaActualizada.id) {
+            throw new Error("Tarea no encontrada")
+        }
+
+        return tareaActualizada;
     }
 
     async eliminarTarea(id: string) {
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea")
-        }
-
+        
         const tarea = await prisma.tarea.delete({
             where: { id }
         })
+
+        if (!tarea.id) {
+            throw new Error("Tarea no encontrada")
+        }
+
         return tarea;
     }
 
@@ -114,15 +118,12 @@ export class TareaService {
     }
 
     async programarTrabajoAsincrono(id: string) {
-        if (!id) {
-            throw new Error("No se encontró el id de esta tarea")
-        }
 
         const tarea = await prisma.tarea.findUnique({
             where: { id }
         })
 
-        if (!tarea) {
+        if (!tarea?.id) {
             throw new Error("Tarea no encontrada");
         }
 

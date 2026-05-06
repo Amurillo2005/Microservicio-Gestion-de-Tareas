@@ -9,17 +9,15 @@ export const crearTarea = async (req: Request, res: Response): Promise<void> => 
         const tarea = await tareaService.crearTarea({ title, description, status, assignedTo, dueDate });
         res.status(201).json(tarea);
     } catch (error: any) {
-        if (error.message === "Campos incompletos") {
+        if (error.message === "El titulo es requerido") {
             res.status(400).json({
-                message: "Campos incompletos"
+                message: "El titulo es requerido"
             });
             return;
         }
+
         res.status(500).json({
-            error: "Error al crear la tarea",
-            detalle: {
-                error
-            }
+            error: "Error al crear la tarea", 
         });
     }
 }
@@ -75,9 +73,9 @@ export const actualizarTareaCompleta = async (req: Request, res: Response): Prom
         const tarea = await tareaService.actualizarTareaCompleta(id as string, { title, description, status, assignedTo, dueDate });
         res.status(200).json(tarea);
     } catch (error: any) {
-        if (error.message === "No se encontró el id de esta tarea") {
-            res.status(400).json({
-                message: "El id es requerido"
+        if (error.message === "Tarea no encontrada") {
+            res.status(404).json({
+                message: "Tarea no encontrada"
             });
             return;
         }
@@ -104,16 +102,14 @@ export const actualizarTareaParcial = async (req: Request, res: Response): Promi
         res.status(200).json(tarea);
     } catch (error: any) {
 
-        if (error.message === "No se encontró el id de esta tarea") {
-            res.status(400).json({
-                message: "El id es requerido"
+        if (error.message === "Tarea no encontrada") {
+            res.status(404).json({
+                message: "Tarea no encontrada"
             });
             return;
         }
 
-        res.status(500).json({
-            error: "Error al actualizar parcialmente la tarea"
-        });
+        res.status(500).json({error: "Error al actualizar parcialmente la tarea"});
     }
 }
 
@@ -126,15 +122,15 @@ export const eliminarTarea = async (req: Request, res: Response): Promise<void> 
             message: "Tarea eliminada exitosamente"
         });
     } catch (error: any) {
-        if (error.message === "No se encontró el id de esta tarea") {
-            res.status(400).json({
-                message: "El id es requerido"
+        if (error.message === "Tarea no encontrada") {
+            res.status(404).json({
+                message: "Tarea no encontrada"
             });
             return;
         }
 
         res.status(500).json({
-            error: "Error al actualizar parcialmente la tarea"
+            error: "Error al eliminar la tarea"
         });
     }
 }
@@ -176,7 +172,7 @@ export const programarTrabajoAsincrono = async (req: Request, res: Response): Pr
         })
 
     } catch (error: any) {
-        if (error.message === "No se encontró el id de esta tarea") {
+        if (error.message === "Tarea no encontrada") {
             res.status(404).json({
                 message: "Tarea no encontrada"
             });

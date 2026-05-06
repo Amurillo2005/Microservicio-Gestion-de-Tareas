@@ -6,8 +6,8 @@ import { tareaQueue } from "../queue/tarea.queue.js";
 
 export class TareaService {
     async crearTarea (tarea: ITarea) {
-        if (!tarea.title || !tarea.status ) {
-            throw new Error("Campos incompletos");
+        if (!tarea.title) {
+            throw new Error("El titulo es requerido");
         }
 
         const tareaCreada = await Tarea.create(tarea);

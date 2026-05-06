@@ -6,19 +6,22 @@ import { Temporal } from "@js-temporal/polyfill";
 
 export class TareaService {
     async crearTarea(tarea: tarea) {
-        if (!tarea.title || !tarea.status ) {
-            throw new Error("Campos incompletos");
+        if (!tarea.title) {
+            throw new Error("El titulo es requerido");
         }
+
 
         const [tareas] = await pool.query<ResultSetHeader>(
             "INSERT INTO Tarea (title, description, status, assignedTo, dueDate) VALUES (?, ?, ?, ?, ?)",
-            [tarea.title, tarea.description, tarea.status, tarea.assignedTo, tarea.dueDate]
+            [tarea.title, tarea.description, tarea.status ?? "PENDING", tarea.assignedTo, tarea.dueDate]
         );
 
-        return {
-            ...(tareas.insertId ? { id: tareas.insertId } : {}),
-            ...tarea
-        };
+        const [rows] = await pool.query<RowDataPacket[]>(
+            "SELECT * FROM Tarea WHERE id = ?",
+            [tareas.insertId]
+        );
+
+        return rows[0];
     }
 
     async obtenerTodasLasTareas() {
@@ -67,10 +70,12 @@ export class TareaService {
             [tarea.title ?? null, tarea.description ?? null, tarea.status ?? null, tarea.assignedTo ?? null, tarea.dueDate ?? null, id]
         );
 
-        return {
-            ...(tareas.insertId ? { id: tareas.insertId } : {}),
-            ...tarea
-        };
+        const [rows] = await pool.query<RowDataPacket[]>(
+            "SELECT * FROM Tarea WHERE id = ?",
+            [id]
+        );
+
+        return rows[0];
     }
 
     async eliminarTarea(id: number) {
@@ -119,11 +124,11 @@ export class TareaService {
             await tareaQueue.add("Notificar fecha de vencimiento", {
                 tareaId: tarea.id,
                 title: tarea.title
-            },{
+            }, {
                 jobId: JobId,
                 removeOnComplete: false
             })
-        }else {
+        } else {
             throw new Error("La tarea ya ha vencido");
         }
 
